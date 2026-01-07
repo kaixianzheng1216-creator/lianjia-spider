@@ -44,9 +44,11 @@ class ModelPipeline:
             features, target, test_size=0.2, random_state=42
         )
 
+        logger.info("正在训练 CatBoost 模型...")
         catboost_model = self._train_catboost(train_features, train_target, test_features, test_target)
         self._evaluate(catboost_model, test_features, test_target, "CatBoost")
 
+        logger.info("正在训练 RandomForest 模型...")
         rf_model, test_features_encoded = self._train_random_forest(train_features, train_target, test_features)
         self._evaluate(rf_model, test_features_encoded, test_target, "RandomForest")
 
@@ -93,10 +95,17 @@ class ModelPipeline:
 
     def _evaluate(self, model, features, target, model_name: str):
         target_pred = model.predict(features)
+        
+        rmse = np.sqrt(mean_squared_error(target, target_pred))
+        mae = mean_absolute_error(target, target_pred)
+        r2 = r2_score(target, target_pred)
+
+        logger.info(f"模型评估: {model_name}: RMSE={rmse:.3f}, MAE={mae:.3f}, R2={r2:.3f}")
+
         self.performance_metrics.extend([
-            {'Model': model_name, 'Metric': 'RMSE', 'Value': np.sqrt(mean_squared_error(target, target_pred))},
-            {'Model': model_name, 'Metric': 'MAE', 'Value': mean_absolute_error(target, target_pred)},
-            {'Model': model_name, 'Metric': 'R2', 'Value': r2_score(target, target_pred)}
+            {'Model': model_name, 'Metric': 'RMSE', 'Value': rmse},
+            {'Model': model_name, 'Metric': 'MAE', 'Value': mae},
+            {'Model': model_name, 'Metric': 'R2', 'Value': r2}
         ])
 
     def _apply_style(self, fig, title: str):

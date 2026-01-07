@@ -10,7 +10,8 @@ from src.spiders.spider import LianJiaSpider
 def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
+        format='[%(asctime)s] %(message)s',
+        datefmt='%H:%M:%S'
     )
 
 def check_missing_cities() -> dict:
@@ -36,18 +37,18 @@ def main():
     missing_cities = check_missing_cities()
 
     if missing_cities:
-        logger.info(f"=== 阶段 1/4: 启动爬虫 (目标: {list(missing_cities.values())}) ===")
+        logger.info(f">>> 阶段 1/4: 开始爬取 (目标: {list(missing_cities.values())})")
         LianJiaSpider().run(missing_cities)
     else:
-        logger.info("=== 阶段 1/4: 数据已完整，跳过爬取 ===")
+        logger.info(">>> 阶段 1/4: 数据已完整，跳过爬取")
 
-    logger.info("=== 阶段 2/4: 数据清洗 ===")
+    logger.info(">>> 阶段 2/4: 数据清洗")
     df_clean = DataCleaner.execute_task()
 
-    logger.info("=== 阶段 3/4: 数据可视化 ===")
+    logger.info(">>> 阶段 3/4: 数据可视化")
     RentalDataVisualizer(df_clean).run()
 
-    logger.info("=== 阶段 4/4: 价格预测建模 ===")
+    logger.info(">>> 阶段 4/4: 价格预测建模")
     ModelPipeline(df_clean).run()
 
 if __name__ == '__main__':
