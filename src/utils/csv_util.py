@@ -39,8 +39,14 @@ class CsvUtil:
             return None
 
         try:
-            df_list = [pd.read_csv(f, encoding='utf-8-sig') for f in files]
+            df_list = []
+            for f in files:
+                df_temp = pd.read_csv(f, encoding='utf-8-sig')
+                df_list.append(df_temp)
 
-            return pd.concat(df_list, ignore_index=True) if df_list else None
+            if not df_list:
+                return None
+
+            return pd.concat(df_list, ignore_index=True)
         except Exception as e:
             return None

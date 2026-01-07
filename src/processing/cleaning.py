@@ -74,7 +74,10 @@ class DataCleaner:
 
     def _parse_prices(self, df: pd.DataFrame) -> pd.DataFrame:
         def _calc_stats(val: str) -> pd.Series:
-            nums = [float(x) for x in self._PATTERN_PRICE.findall(str(val))]
+            raw_nums = self._PATTERN_PRICE.findall(str(val))
+            nums = []
+            for x in raw_nums:
+                nums.append(float(x))
             if not nums:
                 return pd.Series([0.0, 0.0, 0.0])
             return pd.Series([min(nums), max(nums), sum(nums) / len(nums)])

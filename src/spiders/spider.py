@@ -71,7 +71,10 @@ class LianJiaSpider:
             soup = BeautifulSoup(resp.content, 'html.parser')
             cards = soup.select('div.content__list--item')
 
-            return [self._parse_card(card, city_name) for card in cards]
+            results = []
+            for card in cards:
+                results.append(self._parse_card(card, city_name))
+            return results
         except Exception as e:
             logger.error(f"请求异常 (Page {page}): {e}")
             return []
@@ -94,14 +97,26 @@ class LianJiaSpider:
         floor_txt = _text('p.content__list--item--des span.hide')
         title = _text('p.content__list--item--title')
 
-        locs = [a.get_text(strip=True) for a in card.select('p.content__list--item--des a')[:3]]
-        locs += [''] * (3 - len(locs))
+        locs = []
+        for a in card.select('p.content__list--item--des a')[:3]:
+            locs.append(a.get_text(strip=True))
+        
+        # padding
+        for _ in range(3 - len(locs)):
+            locs.append('')
 
         layout = self._PATTERNS['layout'].search(desc)
-        rooms = [int(x) for x in layout.groups()] if layout else [0, 0, 0]
+        rooms = [0, 0, 0]
+        if layout:
+            rooms = []
+            for x in layout.groups():
+                rooms.append(int(x))
 
         price_str = _text('span.content__list--item-price em')
-        tags = '|'.join([i.get_text(strip=True) for i in card.select('p.content__list--item--bottom i')])
+        tag_texts = []
+        for i in card.select('p.content__list--item--bottom i'):
+            tag_texts.append(i.get_text(strip=True))
+        tags = '|'.join(tag_texts)
 
         return {
             'city': city_name,
