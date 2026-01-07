@@ -100,8 +100,6 @@ class LianJiaSpider:
         locs = []
         for a in card.select('p.content__list--item--des a')[:3]:
             locs.append(a.get_text(strip=True))
-        
-        # padding
         for _ in range(3 - len(locs)):
             locs.append('')
 
@@ -113,6 +111,7 @@ class LianJiaSpider:
                 rooms.append(int(x))
 
         price_str = _text('span.content__list--item-price em')
+
         tag_texts = []
         for i in card.select('p.content__list--item--bottom i'):
             tag_texts.append(i.get_text(strip=True))

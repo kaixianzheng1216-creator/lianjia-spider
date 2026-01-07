@@ -76,10 +76,13 @@ class DataCleaner:
         def _calc_stats(val: str) -> pd.Series:
             raw_nums = self._PATTERN_PRICE.findall(str(val))
             nums = []
+
             for x in raw_nums:
                 nums.append(float(x))
+
             if not nums:
                 return pd.Series([0.0, 0.0, 0.0])
+
             return pd.Series([min(nums), max(nums), sum(nums) / len(nums)])
 
         stats = df['price_rmb'].apply(_calc_stats)
@@ -93,6 +96,7 @@ class DataCleaner:
                 return self.now.strftime('%Y-%m-%d')
 
             match = self._PATTERN_REL_DATE.search(date_str)
+
             if match:
                 val, unit = match.groups()
                 unit_key = unit.replace('个', '')
