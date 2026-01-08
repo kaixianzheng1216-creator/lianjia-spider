@@ -20,7 +20,9 @@ class CsvUtil:
         filename = f"{prefix}_{city_name}.csv" if city_name else f"{prefix}.csv"
         file_path = target_dir / filename
 
-        df.to_csv(file_path, index=False, encoding='utf-8-sig')
+        if df is not None:
+            df.to_csv(file_path, index=False, encoding='utf-8-sig')
+
         return file_path
 
     @staticmethod
